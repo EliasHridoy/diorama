@@ -140,11 +140,13 @@ Rules enforced by `validateScene`: unknown keys are rejected (catches typos), id
 
 **Status is computed, never stored (D-12)** by `deriveStatus(scene, issueStates)`:
 
-- **Part:** `done` when all its issues are closed; `in_progress` when some are closed or an open issue has an open PR; otherwise `planned`. Progress = closed / total issues.
+- **Part:** issues closed as "not planned" are set aside (D-15); if that leaves nothing the part is `dropped`. Otherwise `done` when all remaining issues are closed; `in_progress` when some are closed or an open issue has an open PR; otherwise `planned`. Progress = closed / total issues.
 - **Zone:** `done` if all parts are done, `planned` if all are planned, else `in_progress`. Progress = mean of its parts.
 - **Scene:** progress = mean over all parts. Issues the tracker didn't report count as open and are listed as `missingIssues`.
 
 **Sprints are not in the scene (D-14).** Which sprint a part belongs to comes from its issues' milestones in the tracker, so it can't drift.
+
+Issues can be placed without editing the scene: a `part:<zone>/<part>` label (e.g. `part:cart/trolley`) on a GitHub issue links it to that part. Open issues with no place show in the "not placed" tray.
 
 The scene file can live **in the target repo itself** as `.diorama/scene.json` — versioned, reviewable in PRs, no database needed for v0.1 (see DECISIONS.md D-06).
 

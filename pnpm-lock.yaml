@@ -35,6 +35,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@diorama/connectors':
+        specifier: workspace:^
+        version: link:../../packages/connectors
       '@diorama/schema':
         specifier: workspace:^
         version: link:../../packages/schema
@@ -75,6 +78,22 @@ importers:
       vite:
         specifier: ^8.3.4
         version: 8.3.4(@types/node@24.19.2)
+      vitest:
+        specifier: ^5.0.5
+        version: 5.0.5(@types/node@24.19.2)(vite@8.3.4(@types/node@24.19.2))
+
+  packages/connectors:
+    dependencies:
+      '@diorama/schema':
+        specifier: workspace:^
+        version: link:../schema
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.0
+        version: 24.19.2
+      typescript:
+        specifier: ~6.0.3
+        version: 6.0.3
       vitest:
         specifier: ^5.0.5
         version: 5.0.5(@types/node@24.19.2)(vite@8.3.4(@types/node@24.19.2))

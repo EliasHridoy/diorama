@@ -55,7 +55,13 @@ describe('deriveStatus: parts', () => {
     const part = statusOf([['github:1', 'github:1']], { 'github:1': closed })
       .zones.get('cart')
       ?.parts.get('p0');
-    expect(part).toEqual({ status: 'done', progress: 1, closedIssues: 1, totalIssues: 1 });
+    expect(part).toEqual({
+      status: 'done',
+      progress: 1,
+      closedIssues: 1,
+      totalIssues: 1,
+      droppedIssues: 0,
+    });
   });
 
   it('treats issues the tracker did not report as open and lists them', () => {
@@ -105,5 +111,54 @@ describe('deriveStatus: zones and scene', () => {
     });
     expect(status.missingIssues).toEqual([]);
     expect(status.progress).toBeCloseTo(6 / 15);
+  });
+});
+
+describe('deriveStatus: dropped scope (D-15)', () => {
+  const dropped: IssueState = { state: 'closed', stateReason: 'not_planned' };
+  const completed: IssueState = { state: 'closed', stateReason: 'completed' };
+
+  it('sets dropped issues aside when judging a part', () => {
+    const part = statusOf([['github:1', 'github:2']], {
+      'github:1': completed,
+      'github:2': dropped,
+    })
+      .zones.get('cart')
+      ?.parts.get('p0');
+    expect(part).toEqual({
+      status: 'done',
+      progress: 1,
+      closedIssues: 1,
+      totalIssues: 1,
+      droppedIssues: 1,
+    });
+    const stillOpen = statusOf([['github:1', 'github:2']], {
+      'github:1': open,
+      'github:2': dropped,
+    });
+    expect(stillOpen.zones.get('cart')?.parts.get('p0')?.status).toBe('planned');
+  });
+
+  it('marks a part dropped when every issue was dropped', () => {
+    const status = statusOf([['github:1']], { 'github:1': dropped });
+    expect(status.zones.get('cart')?.parts.get('p0')).toMatchObject({
+      status: 'dropped',
+      progress: 0,
+      totalIssues: 0,
+    });
+    expect(status.zones.get('cart')?.status).toBe('dropped');
+  });
+
+  it('ignores dropped parts in zone and scene status and progress', () => {
+    const status = statusOf([['github:1'], ['github:2']], {
+      'github:1': completed,
+      'github:2': dropped,
+    });
+    expect(status.zones.get('cart')).toMatchObject({ status: 'done', progress: 1 });
+    expect(status.progress).toBe(1);
+  });
+
+  it('treats closed issues without a reason as completed', () => {
+    expect(statusOf([['github:1']], { 'github:1': closed }).zones.get('cart')?.status).toBe('done');
   });
 });

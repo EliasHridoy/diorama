@@ -7,17 +7,19 @@ interface DevPanelProps {
   onReset: () => void;
 }
 
-/** Cycle used by the dev panel: open → open with PR → closed → open. */
+/** Cycle used by the dev panel: open → open with PR → closed → not planned → open. */
 function next(issue: IssueState | undefined): IssueState {
   if (!issue || (issue.state === 'open' && !issue.hasOpenPullRequest))
     return { state: 'open', hasOpenPullRequest: true };
-  if (issue.state === 'open') return { state: 'closed' };
+  if (issue.state === 'open') return { state: 'closed', stateReason: 'completed' };
+  if (issue.stateReason !== 'not_planned') return { state: 'closed', stateReason: 'not_planned' };
   return { state: 'open' };
 }
 
 function label(issue: IssueState | undefined): string {
   if (!issue) return 'unknown';
-  if (issue.state === 'closed') return 'closed';
+  if (issue.state === 'closed')
+    return issue.stateReason === 'not_planned' ? 'not planned' : 'closed';
   return issue.hasOpenPullRequest ? 'PR open' : 'open';
 }
 
@@ -53,8 +55,8 @@ export function DevPanel({ scene, issues, onChange, onReset }: DevPanelProps) {
                     return (
                       <button
                         key={ref}
-                        className={`chip ${issue?.state ?? 'unknown'}${issue?.hasOpenPullRequest ? ' pr' : ''}`}
-                        title="Click to cycle: open → PR open → closed"
+                        className={`chip ${issue?.state ?? 'unknown'}${issue?.hasOpenPullRequest ? ' pr' : ''}${issue?.stateReason === 'not_planned' ? ' dropped' : ''}`}
+                        title="Click to cycle: open → PR open → closed → not planned"
                         onClick={() => onChange(new Map(issues).set(ref, next(issue)))}
                       >
                         {ref.replace(/^github:/, '#')} {label(issue)}

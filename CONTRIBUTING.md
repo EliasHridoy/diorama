@@ -18,6 +18,7 @@ pnpm check   # typecheck, lint, format check, test, build (what CI runs)
 apps/web          3D viewer (Vite + React + React Three Fiber)
 packages/schema   Scene schema: types, validation, status derivation
 packages/themes   Themes: slots, layout, common kit
+packages/connectors   GitHub: issues, scene file, label mapping
 ```
 
 More packages (`themes`, `connectors`, `agent`) are added as their phase starts.

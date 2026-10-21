@@ -5,7 +5,7 @@ import type { Group } from 'three';
 import { PartAnimator, type LookTarget } from './partAnimator.ts';
 import { PartLookContext } from './partLook.ts';
 import { Prop } from './props.tsx';
-import { GHOST_COLOR, STATUS_LOOK } from './statusStyle.ts';
+import { DROPPED_COLOR, GHOST_COLOR, STATUS_LOOK } from './statusStyle.ts';
 
 interface PartModelProps {
   asset: string;
@@ -14,12 +14,17 @@ interface PartModelProps {
   highlighted: boolean;
 }
 
+function ghostColor(status: BuildStatus): string | null {
+  if (status === 'planned') return GHOST_COLOR;
+  return status === 'dropped' ? DROPPED_COLOR : null;
+}
+
 /** One part's prop, easing between ghost, in-progress and built looks as its status changes. */
 export function PartModel({ asset, status, accent, highlighted }: PartModelProps) {
   const look = STATUS_LOOK[status];
   const target: LookTarget = {
     opacity: look.opacity,
-    color: status === 'planned' ? GHOST_COLOR : accent,
+    color: ghostColor(status) ?? accent,
     glow: highlighted ? accent : null,
   };
   const [animator] = useState(() => new PartAnimator(target));
@@ -40,7 +45,7 @@ export function PartModel({ asset, status, accent, highlighted }: PartModelProps
     () => ({
       material: animator.material,
       edgeColor: look.edgeColor,
-      castShadow: status !== 'planned',
+      castShadow: status === 'in_progress' || status === 'done',
     }),
     [animator, look.edgeColor, status],
   );

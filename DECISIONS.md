@@ -2,23 +2,23 @@
 
 A running log of choices. **Open** = needs your call (my recommendation is given). **Decided** = settled; change it by editing here with a reason.
 
-| ID   | Topic                                        | Status                       | Needed by   |
-| ---- | -------------------------------------------- | ---------------------------- | ----------- |
-| D-01 | Monorepo tooling                             | Decided (pnpm workspaces)    | —           |
-| D-02 | Web framework                                | Decided (Vite + React + R3F) | —           |
-| D-03 | Backend shape                                | Open                         | Phase 4     |
-| D-04 | License                                      | Decided (MIT, changeable)    | —           |
-| D-05 | GitHub auth                                  | Open                         | Phase 4 / 6 |
-| D-06 | Where the scene lives                        | Open                         | Phase 4     |
-| D-07 | Art style & assets                           | Open                         | Phase 3     |
-| D-08 | LLM key & cost model                         | Open                         | Phase 5     |
-| D-09 | Hosting                                      | Open                         | Phase 6     |
-| D-10 | Product-first or research-first              | Decided (research-first)     | —           |
-| D-11 | The AI does not generate 3D meshes           | Decided                      | —           |
-| D-12 | Status is derived, never stored              | Decided                      | —           |
-| D-13 | Cross-theme common kit                       | Decided                      | —           |
-| D-14 | Sprints come from the tracker, not the scene | Decided                      | —           |
-| D-15 | Issues closed as "not planned"               | Open                         | Phase 4     |
+| ID   | Topic                                        | Status                         | Needed by |
+| ---- | -------------------------------------------- | ------------------------------ | --------- |
+| D-01 | Monorepo tooling                             | Decided (pnpm workspaces)      | —         |
+| D-02 | Web framework                                | Decided (Vite + React + R3F)   | —         |
+| D-03 | Backend shape                                | Decided (browser-only for now) | —         |
+| D-04 | License                                      | Decided (MIT, changeable)      | —         |
+| D-05 | GitHub auth                                  | Decided (PAT now, App later)   | —         |
+| D-06 | Where the scene lives                        | Decided (in the repo)          | —         |
+| D-07 | Art style & assets                           | Open                           | Phase 3   |
+| D-08 | LLM key & cost model                         | Open                           | Phase 5   |
+| D-09 | Hosting                                      | Open                           | Phase 6   |
+| D-10 | Product-first or research-first              | Decided (research-first)       | —         |
+| D-11 | The AI does not generate 3D meshes           | Decided                        | —         |
+| D-12 | Status is derived, never stored              | Decided                        | —         |
+| D-13 | Cross-theme common kit                       | Decided                        | —         |
+| D-14 | Sprints come from the tracker, not the scene | Decided                        | —         |
+| D-15 | Issues closed as "not planned"               | Decided (`dropped` status)     | —         |
 
 ---
 
@@ -32,26 +32,44 @@ One monorepo with pnpm workspaces. Add Turborepo later only if builds get slow. 
 - **Why not Rust (Bevy/wgpu → WASM) for now:** three.js and Bevy both draw through the browser's WebGL/WebGPU, and a diorama of a few hundred objects is limited by the GPU, not by JavaScript. Rust would bring a bigger first download (several MB of WASM), slower iteration, fewer ready-made tools and fewer contributors. That's a bad trade for a research tool that participants open from a link.
 - **Rust stays possible:** the scene format is language-neutral (JSON Schema), so a Bevy viewer could be added later. If profiling finds a CPU hot spot (layout of huge scenes, thousands of flow particles), that piece can be written in Rust → WASM and called from TS.
 
-### D-03 — Backend shape · Open
+### D-03 — Backend shape · Decided
+
+**Browser-only through Phase 5.** The viewer calls `api.github.com` directly with a token held in memory; connector code lives in `packages/connectors` so a Node server can reuse it later (webhooks and OAuth secrets in Phase 6).
+
+<details><summary>Options considered</summary>
 
 - **Options:**
   - a) **No backend for MVP-dev:** browser talks to GitHub API with a token, scene lives in the repo (D-06), LLM called with a BYO key.
   - b) Small Node server (Hono or Fastify) in `apps/server`: connectors, agent, webhooks, SSE.
 - **Recommendation:** start with **(a)** through Phase 4, add **(b)** in Phase 5–6 when we need webhooks, OAuth secrets and server-side LLM calls. Keep connector/agent code in `packages/` so it runs in either place.
 
+</details>
+
 ### D-04 — License · Decided: MIT
 
 MIT is the most permissive and common for dev tools. Switch to Apache-2.0 if you want an explicit patent grant. Change it now rather than later, before outside contributions arrive.
 
-### D-05 — GitHub auth · Open
+### D-05 — GitHub auth · Decided
+
+**Fine-grained personal access token** (Issues, Contents and Pull requests read access), entered in the GitHub dialog, kept in tab memory only. A GitHub App comes in Phase 6.
+
+<details><summary>Options considered</summary>
 
 - **Options:** Personal access token (dev) → OAuth App → GitHub App
 - **Recommendation:** PAT in Phase 4, **GitHub App** in Phase 6. A GitHub App gets per-repo installs, webhooks out of the box and higher rate limits. That fits "pick a repo" better than an OAuth App.
 
-### D-06 — Where the scene lives · Open
+</details>
+
+### D-06 — Where the scene lives · Decided
+
+**In the repo** as `.diorama/scene.json`. Connecting reads it; if absent, the scene already on screen is used. Saving back is not built yet (`writeRepoFile` exists).
+
+<details><summary>Options considered</summary>
 
 - **Options:** In a database on our server · As `.diorama/scene.json` inside the user's repo · Both (repo = source of truth, DB = cache)
 - **Recommendation:** **In the repo.** It's versioned, diffable in PRs, works with zero infrastructure, fits open source culture, and gives the timeline feature (v0.5) git history for free. A DB is only a cache later.
+
+</details>
 
 ### D-07 — Art style & assets · Open
 
@@ -90,9 +108,15 @@ Modules that appear in most products get reusable metaphors that work in any the
 
 The original sketch put `"sprint"` on each zone. It is dropped from schema v1: parts in one zone often ship in different sprints, and storing it would drift from the tracker, the same reason as D-12. A part's sprint is read from its issues' milestones by the connector (Phase 4), and the sprint filter (Phase 6) uses that.
 
-### D-15 — Issues closed as "not planned" · Open
+### D-15 — Issues closed as "not planned" · Decided
+
+**New `dropped` status.** Issues closed as not planned (or duplicate) are set aside: they don't count towards progress; a part whose issues were all dropped is `dropped` and drawn as a faded grey ghost. Dropped parts are also ignored in zone and scene progress.
+
+<details><summary>Options considered</summary>
 
 GitHub can close an issue as _completed_ or _not planned_. Today `deriveStatus` counts any closed issue as built, so dropping a feature would make its part look finished.
 
 - **Options:** (a) count it as done (current) · (b) leave it out of the part's total, so a part whose issues were all dropped looks `planned` with nothing left to build · (c) a fourth status `dropped` drawn as a faded or crossed-out ghost
 - **Recommendation:** **(c)** when the connector lands in Phase 4. Seeing scope cuts is useful for stakeholders, and it's a measurable event for RQ1.
+
+</details>

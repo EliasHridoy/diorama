@@ -97,20 +97,20 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 ---
 
-## ⬜ Phase 4 — GitHub connector (`packages/connectors`)
+## ✅ Phase 4 — GitHub connector (`packages/connectors`)
 
 **Goal:** Real issues drive the scene.
 
-- [ ] Auth for development: a fine-grained personal access token (OAuth comes in Phase 6)
-- [ ] Fetch issues, milestones, linked PRs for a repo (GraphQL, paginated, rate-limit aware)
-- [ ] Normalized model: `{ ref, title, state, assignees, milestone, labels, url, linkedPRs }`
-- [ ] Mapping without AI: labels like `zone:cart` / `part:cart/trolley` → parts
-- [ ] Read/write `.diorama/scene.json` from the repo (D-06)
-- [ ] Polling sync + a "Sync now" button; viewer updates live
-- [ ] Unmapped issues tray ("these issues aren't placed anywhere yet")
+- [x] Auth for development: a fine-grained personal access token (OAuth comes in Phase 6)
+- [x] Fetch issues, milestones, linked PRs for a repo (GraphQL, paginated up to 5,000 issues, typed errors incl. rate limits)
+- [x] Normalized model: `{ ref, title, state, assignees, milestone, labels, url, linkedPRs }`
+- [x] Mapping without AI: labels like `zone:cart` / `part:cart/trolley` → parts
+- [x] Read `.diorama/scene.json` from the repo (D-06). `writeRepoFile` exists and is tested, but nothing in the UI saves yet; the agent in Phase 5 is what will write scenes
+- [x] Polling sync + a "Sync now" button; viewer updates live
+- [x] Unmapped issues tray ("these issues aren't placed anywhere yet")
 
-**Exit check:** Close an issue on GitHub → after sync, its part turns solid.
-**Decision needed:** D-03 (backend shape), D-05 (auth) before this phase starts.
+**Also done:** the `dropped` status for issues closed as "not planned" (D-15), issue titles/assignees/sprints in the zone panel, a GitHub dialog with sync state and the unplaced-issues tray.
+**Exit check (met in a simulated GitHub):** in headless Chrome, closing issues in the fake GitHub and pressing _Sync now_ moved Cart 0% → 75% and the overall build 40% → 50%; closing an issue as "not planned" turned its part into a grey ghost. The query and error handling were also run against the real API (read-only). ← **waiting on you**: try it on a real repo with a throwaway token.
 
 ---
 

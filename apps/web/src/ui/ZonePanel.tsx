@@ -1,3 +1,4 @@
+import type { NormalizedIssue } from '@diorama/connectors';
 import type { IssueRef, IssueState, Scene, SceneStatus } from '@diorama/schema';
 import { ProgressBar, StatusPill } from './bits.tsx';
 import { issueUrl } from './issueUrl.ts';
@@ -6,6 +7,8 @@ interface ZonePanelProps {
   scene: Scene;
   status: SceneStatus;
   issues: ReadonlyMap<IssueRef, IssueState>;
+  /** Titles, assignees and milestones from the tracker, when connected. */
+  details?: ReadonlyMap<IssueRef, NormalizedIssue>;
   zoneId: string;
   onClose: () => void;
   onSelectZone: (zoneId: string) => void;
@@ -15,6 +18,7 @@ export function ZonePanel({
   scene,
   status,
   issues,
+  details,
   zoneId,
   onClose,
   onSelectZone,
@@ -63,16 +67,21 @@ export function ZonePanel({
                   const url = issueUrl(scene.project, ref);
                   const state = issue
                     ? issue.state === 'closed'
-                      ? 'closed'
+                      ? issue.stateReason === 'not_planned'
+                        ? 'not planned'
+                        : 'closed'
                       : issue.hasOpenPullRequest
                         ? 'PR open'
                         : 'open'
                     : 'unknown';
                   const text = `${ref} · ${state}`;
+                  const title = details?.get(ref)?.title;
+                  const className = `chip ${issue?.state ?? 'unknown'}${issue?.stateReason === 'not_planned' ? ' dropped' : ''}`;
                   return url ? (
                     <a
                       key={ref}
-                      className={`chip ${issue?.state ?? 'unknown'}`}
+                      className={className}
+                      title={title}
                       href={url}
                       target="_blank"
                       rel="noreferrer"
@@ -80,12 +89,13 @@ export function ZonePanel({
                       {text}
                     </a>
                   ) : (
-                    <span key={ref} className={`chip ${issue?.state ?? 'unknown'}`}>
+                    <span key={ref} className={className} title={title}>
                       {text}
                     </span>
                   );
                 })}
               </div>
+              <PartMeta refs={part.issues} details={details} />
             </li>
           );
         })}
@@ -113,5 +123,32 @@ export function ZonePanel({
         ))}
       </ul>
     </aside>
+  );
+}
+
+/** Titles, assignees and milestones of a part's issues, from the tracker. */
+function PartMeta({
+  refs,
+  details,
+}: {
+  refs: readonly IssueRef[];
+  details: ReadonlyMap<IssueRef, NormalizedIssue> | undefined;
+}) {
+  const issues = refs.flatMap((ref) => details?.get(ref) ?? []);
+  if (issues.length === 0) return null;
+  const unique = (values: string[]) => [...new Set(values)];
+  const people = unique(issues.flatMap((i) => i.assignees));
+  const sprints = unique(issues.flatMap((i) => (i.milestone ? [i.milestone.title] : [])));
+  return (
+    <div className="issue-meta muted small">
+      {issues.map((i) => (
+        <div key={i.ref}>{i.title}</div>
+      ))}
+      {(people.length > 0 || sprints.length > 0) && (
+        <div>
+          {[sprints.join(', '), people.map((p) => `@${p}`).join(' ')].filter(Boolean).join(' · ')}
+        </div>
+      )}
+    </div>
   );
 }
