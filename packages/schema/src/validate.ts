@@ -1,4 +1,6 @@
-import { SceneSchema, type Scene } from './scene.ts';
+import type { z } from 'zod';
+import { SceneSchema, type IssueRef, type Scene } from './scene.ts';
+import { IssueStatesSchema, type IssueState } from './status.ts';
 
 /** What validation needs to know about a theme. Full theme manifests arrive in Phase 3. */
 export interface ThemeInfo {
@@ -26,18 +28,25 @@ export interface ValidateOptions {
 /** Parses and validates an untrusted scene (e.g. from a file, a repo or the agent). */
 export function validateScene(input: unknown, options: ValidateOptions = {}): ValidationResult {
   const parsed = SceneSchema.safeParse(input);
-  if (!parsed.success) {
-    return {
-      success: false,
-      errors: parsed.error.issues.map((issue) => ({
-        path: formatPath(issue.path),
-        message: issue.message,
-      })),
-    };
-  }
+  if (!parsed.success) return { success: false, errors: toValidationErrors(parsed.error) };
 
   const errors = options.theme ? checkTheme(parsed.data, options.theme) : [];
   return errors.length > 0 ? { success: false, errors } : { success: true, scene: parsed.data };
+}
+
+export type IssueStatesResult =
+  | { success: true; issues: Map<IssueRef, IssueState> }
+  | { success: false; errors: ValidationError[] };
+
+/** Parses an untrusted `{ "github:12": { "state": "closed" }, ... }` object. */
+export function validateIssueStates(input: unknown): IssueStatesResult {
+  const parsed = IssueStatesSchema.safeParse(input);
+  if (!parsed.success) return { success: false, errors: toValidationErrors(parsed.error) };
+  return { success: true, issues: new Map(Object.entries(parsed.data)) };
+}
+
+function toValidationErrors(error: z.ZodError): ValidationError[] {
+  return error.issues.map((issue) => ({ path: formatPath(issue.path), message: issue.message }));
 }
 
 function checkTheme(scene: Scene, theme: ThemeInfo): ValidationError[] {

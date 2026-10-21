@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { validateScene, type ThemeInfo } from '../index.ts';
-import { cornerShop, minimalScene } from './fixtures.ts';
+import { validateIssueStates, validateScene, type ThemeInfo } from '../index.ts';
+import { cornerShop, minimalScene, readExample } from './fixtures.ts';
 
 const shopTheme: ThemeInfo = {
   id: 'ecommerce-shop',
@@ -103,5 +103,25 @@ describe('validateScene', () => {
       expect(result.success).toBe(false);
       if (!result.success) expect(result.errors[0]?.path).toBe('theme');
     });
+  });
+});
+
+describe('validateIssueStates', () => {
+  it('parses the corner-shop issue file into a map', () => {
+    const result = validateIssueStates(readExample('corner-shop.issues.json'));
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.issues.size).toBe(17);
+      expect(result.issues.get('github:9')).toEqual({ state: 'open', hasOpenPullRequest: true });
+    }
+  });
+
+  it('rejects bad refs and unknown states', () => {
+    const result = validateIssueStates({
+      '12': { state: 'closed' },
+      'github:1': { state: 'merged' },
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.errors.map((e) => e.path)).toEqual(['12', 'github:1.state']);
   });
 });
