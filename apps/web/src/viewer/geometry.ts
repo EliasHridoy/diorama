@@ -1,5 +1,5 @@
 import { Quaternion, Vector3 } from 'three';
-import { layoutParts, type PlacedZone } from '../theme/shopLayout.ts';
+import { layoutParts, type PlacedZone } from '@diorama/themes';
 
 /** Thickness of a zone's floor tile; parts stand on top of it. */
 export const PLATFORM_HEIGHT = 0.12;

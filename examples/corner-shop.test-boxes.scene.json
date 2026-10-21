@@ -1,0 +1,156 @@
+{
+  "$schema": "../packages/schema/scene.schema.json",
+  "schemaVersion": 1,
+  "project": {
+    "name": "Corner Shop (test-boxes theme)",
+    "repo": "github:acme/corner-shop"
+  },
+  "theme": "test-boxes",
+  "zones": [
+    {
+      "id": "auth",
+      "label": "Authentication",
+      "metaphor": "box-a",
+      "parts": [
+        {
+          "id": "login",
+          "label": "Login",
+          "issues": ["github:1", "github:2"]
+        },
+        {
+          "id": "signup",
+          "label": "Sign-up",
+          "issues": ["github:3"]
+        },
+        {
+          "id": "password-reset",
+          "label": "Password reset",
+          "issues": ["github:4"]
+        }
+      ]
+    },
+    {
+      "id": "catalogue",
+      "label": "Product catalogue",
+      "metaphor": "box-b",
+      "parts": [
+        {
+          "id": "product-list",
+          "label": "Product list",
+          "issues": ["github:5", "github:6"]
+        },
+        {
+          "id": "product-page",
+          "label": "Product page",
+          "issues": ["github:7"]
+        },
+        {
+          "id": "categories",
+          "label": "Categories",
+          "issues": ["github:8"]
+        }
+      ]
+    },
+    {
+      "id": "cart",
+      "label": "Cart",
+      "metaphor": "box-c",
+      "parts": [
+        {
+          "id": "add-to-cart",
+          "label": "Add to cart",
+          "issues": ["github:9"]
+        },
+        {
+          "id": "cart-page",
+          "label": "Cart page",
+          "issues": ["github:10"]
+        }
+      ]
+    },
+    {
+      "id": "checkout",
+      "label": "Checkout & payments",
+      "metaphor": "box-a",
+      "parts": [
+        {
+          "id": "payment-form",
+          "label": "Payment form",
+          "issues": ["github:11"]
+        },
+        {
+          "id": "order-summary",
+          "label": "Order summary",
+          "issues": ["github:12"]
+        },
+        {
+          "id": "receipts",
+          "label": "Receipts",
+          "issues": ["github:13"]
+        }
+      ]
+    },
+    {
+      "id": "inventory",
+      "label": "Inventory",
+      "metaphor": "box-b",
+      "parts": [
+        {
+          "id": "stock-levels",
+          "label": "Stock levels",
+          "issues": ["github:14"]
+        },
+        {
+          "id": "restock-alerts",
+          "label": "Restock alerts",
+          "issues": ["github:15"]
+        }
+      ]
+    },
+    {
+      "id": "notifications",
+      "label": "Notifications",
+      "description": "Common-kit metaphor: letters travel mailbox \u2192 sorting station \u2192 letterbox",
+      "metaphor": "postal-route",
+      "parts": [
+        {
+          "id": "order-emails",
+          "label": "Order emails",
+          "issues": ["github:16"]
+        },
+        {
+          "id": "shipping-updates",
+          "label": "Shipping updates",
+          "issues": ["github:17"]
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "from": "auth",
+      "to": "cart",
+      "label": "identify shopper"
+    },
+    {
+      "from": "catalogue",
+      "to": "cart",
+      "label": "add item"
+    },
+    {
+      "from": "cart",
+      "to": "checkout",
+      "label": "place order"
+    },
+    {
+      "from": "checkout",
+      "to": "inventory",
+      "label": "reserve stock"
+    },
+    {
+      "from": "checkout",
+      "to": "notifications",
+      "label": "order confirmation"
+    }
+  ]
+}

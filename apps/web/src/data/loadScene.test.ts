@@ -75,3 +75,44 @@ describe('isSceneJson', () => {
     expect(isSceneJson(null)).toBe(false);
   });
 });
+
+describe('themes', () => {
+  const zone = { id: 'cart', label: 'Cart', parts: [{ id: 'a', label: 'A' }] };
+
+  it('attaches the scene theme', () => {
+    const result = fromJson({ ...scene, zones: [{ ...zone, metaphor: 'trolley' }] }, {}, 'test');
+    expect(result.ok && result.value.theme.id).toBe('ecommerce-shop');
+  });
+
+  it('lists the available themes for an unknown one', () => {
+    const result = fromJson({ ...scene, theme: 'hospital' }, {}, 'test');
+    expect(result).toMatchObject({
+      ok: false,
+      errors: [{ path: 'theme', message: expect.stringContaining('ecommerce-shop, test-boxes') }],
+    });
+  });
+
+  it('rejects metaphors and assets the theme cannot draw', () => {
+    const bad = {
+      ...scene,
+      zones: [
+        { ...zone, metaphor: 'spaceship', parts: [{ id: 'a', label: 'A', asset: 'rocket' }] },
+      ],
+    };
+    const result = fromJson(bad, {}, 'test');
+    expect(result).toMatchObject({
+      ok: false,
+      errors: [{ path: 'zones[0].metaphor' }, { path: 'zones[0].parts[0].asset' }],
+    });
+  });
+
+  it('switches theme without code changes', () => {
+    const boxes = {
+      ...scene,
+      theme: 'test-boxes',
+      zones: [{ ...zone, metaphor: 'box-a' }],
+    };
+    const result = fromJson(boxes, {}, 'test');
+    expect(result.ok && result.value.theme.id).toBe('test-boxes');
+  });
+});

@@ -8,15 +8,14 @@ import { Prop } from './props.tsx';
 import { GHOST_COLOR, STATUS_LOOK } from './statusStyle.ts';
 
 interface PartModelProps {
-  asset: string | undefined;
-  metaphor: string;
+  asset: string;
   status: BuildStatus;
   accent: string;
   highlighted: boolean;
 }
 
 /** One part's prop, easing between ghost, in-progress and built looks as its status changes. */
-export function PartModel({ asset, metaphor, status, accent, highlighted }: PartModelProps) {
+export function PartModel({ asset, status, accent, highlighted }: PartModelProps) {
   const look = STATUS_LOOK[status];
   const target: LookTarget = {
     opacity: look.opacity,
@@ -49,7 +48,7 @@ export function PartModel({ asset, metaphor, status, accent, highlighted }: Part
   return (
     <group ref={group}>
       <PartLookContext.Provider value={partLook}>
-        <Prop asset={asset} metaphor={metaphor} />
+        <Prop asset={asset} />
       </PartLookContext.Provider>
     </group>
   );

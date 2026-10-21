@@ -57,6 +57,7 @@ MIT is the most permissive and common for dev tools. Switch to Apache-2.0 if you
 
 - **Options:** Low-poly CC0 kits (Kenney, Quaternius) · Custom Blender models · Pure procedural boxes/shapes
 - **Recommendation:** **Low-poly CC0 kits** to start, isometric-ish camera, soft pastel palette. Boxes during early Phase 2. Custom art only when the idea is proven.
+- **Phase 3 status:** still open. Themes list their assets by name, so glTF models can replace the primitives later without touching theme or scene files.
 - **Phase 2 status:** low-poly props built from three.js primitives (`apps/web/src/viewer/props.tsx`) look good enough to judge the idea, so real assets can wait until Phase 3.
 
 ### D-08 — LLM key & cost model · Open

@@ -84,10 +84,16 @@ export function App() {
     return <ErrorView source={state.source} errors={state.errors} onOpen={openFiles} />;
   if (!status) return null;
 
-  const { scene } = state.loaded;
+  const { scene, theme } = state.loaded;
   return (
     <div className="app">
-      <Viewer scene={scene} status={status} selectedZone={selectedZone} onSelectZone={selectZone} />
+      <Viewer
+        scene={scene}
+        theme={theme}
+        status={status}
+        selectedZone={selectedZone}
+        onSelectZone={selectZone}
+      />
       <Header scene={scene} status={status} source={state.loaded.source} />
       <div className="toolbar">
         <OpenButton onOpen={openFiles} />

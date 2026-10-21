@@ -94,7 +94,7 @@ diorama/
 │   └── server/       API, connectors, agent, sync (Node) — may start inside web, see DECISIONS.md
 └── packages/
     ├── schema/       Scene schema types + validation (Zod) + status derivation. Zero UI deps.
-    ├── themes/       Theme definitions + assets (shop first)
+    ├── themes/       Theme manifests, layout and the common kit (shop first); no React
     ├── connectors/   GitHub (then Jira) → normalized issue model
     └── agent/        Interview + mapping prompts, Claude API calls, output → schema
 ```
