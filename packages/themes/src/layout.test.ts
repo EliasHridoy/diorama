@@ -1,12 +1,14 @@
 import { SceneSchema, type SceneInput } from '@diorama/schema';
 import { describe, expect, it } from 'vitest';
-import { layoutParts, layoutZones, SHOP_SLOTS } from './shopLayout.ts';
+import { ecommerceShop } from './ecommerceShop.ts';
+import { layoutParts, layoutZones } from './layout.ts';
+import { testBoxes } from './testBoxes.ts';
 
-function scene(metaphors: string[]) {
+function scene(metaphors: string[], theme = ecommerceShop.id) {
   const input: SceneInput = {
     schemaVersion: 1,
     project: { name: 'Test' },
-    theme: 'ecommerce-shop',
+    theme,
     zones: metaphors.map((metaphor, i) => ({ id: `z${i}`, label: `Z${i}`, metaphor })),
   };
   return SceneSchema.parse(input);
@@ -14,23 +16,34 @@ function scene(metaphors: string[]) {
 
 describe('layoutZones', () => {
   it('puts known metaphors on their slot', () => {
-    const placed = layoutZones(scene(['entrance', 'shelves']));
-    expect(placed.get('z0')).toEqual({ ...SHOP_SLOTS.entrance, annex: false });
-    expect(placed.get('z1')).toMatchObject({ x: SHOP_SLOTS.shelves?.x, annex: false });
+    const placed = layoutZones(scene(['entrance', 'shelves']), ecommerceShop);
+    expect(placed.get('z0')).toEqual({ ...ecommerceShop.slots.entrance, annex: false });
+    expect(placed.get('z1')).toMatchObject({ x: ecommerceShop.slots.shelves?.x, annex: false });
   });
 
   it('sends unknown metaphors, taken slots and prototype keys to the annex', () => {
-    const placed = layoutZones(scene(['spaceship', 'shelves', 'shelves', 'constructor']));
-    expect(placed.get('z0')?.annex).toBe(true);
+    const placed = layoutZones(
+      scene(['spaceship', 'shelves', 'shelves', 'constructor']),
+      ecommerceShop,
+    );
+    expect(placed.get('z0')).toMatchObject({ annex: true, defaultAsset: 'crate' });
     expect(placed.get('z1')?.annex).toBe(false);
     expect(placed.get('z2')?.annex).toBe(true);
     expect(placed.get('z3')?.annex).toBe(true);
   });
 
   it('never stacks two annex zones on the same spot', () => {
-    const placed = layoutZones(scene(Array.from({ length: 8 }, (_, i) => `unknown-${i}`)));
-    const spots = new Set([...placed.values()].map((p) => `${p.x},${p.z}`));
-    expect(spots.size).toBe(8);
+    const placed = layoutZones(
+      scene(Array.from({ length: 8 }, (_, i) => `unknown-${i}`)),
+      ecommerceShop,
+    );
+    expect(new Set([...placed.values()].map((p) => `${p.x},${p.z}`)).size).toBe(8);
+  });
+
+  it('lays the same scene out differently in another theme', () => {
+    const placed = layoutZones(scene(['box-a', 'postal-route'], testBoxes.id), testBoxes);
+    expect(placed.get('z0')).toMatchObject({ x: -6, z: 0, annex: false });
+    expect(placed.get('z1')).toMatchObject({ x: 0, z: -7, annex: false });
   });
 });
 

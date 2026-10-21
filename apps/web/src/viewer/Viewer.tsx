@@ -3,7 +3,7 @@ import { OrbitControls } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { track } from '../telemetry.ts';
-import { layoutZones } from '../theme/shopLayout.ts';
+import { layoutZones, type Theme } from '@diorama/themes';
 import { FlowLine } from './FlowLine.tsx';
 import { flowCurve, placeParts, zoneLabelAnchor } from './geometry.ts';
 import { LabelRegistry } from './labelRegistry.ts';
@@ -13,6 +13,7 @@ import { ZoneView } from './ZoneView.tsx';
 
 interface ViewerProps {
   scene: Scene;
+  theme: Theme;
   status: SceneStatus;
   selectedZone: string | null;
   onSelectZone: (zoneId: string | null) => void;
@@ -28,7 +29,7 @@ function initialCameraPosition(aspect: number): [number, number, number] {
   return [x * pullBack, y * pullBack, z * pullBack];
 }
 
-export function Viewer({ scene, status, selectedZone, onSelectZone }: ViewerProps) {
+export function Viewer({ scene, theme, status, selectedZone, onSelectZone }: ViewerProps) {
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
   const [hoveredPart, setHoveredPart] = useState<{ zoneId: string; partId: string } | null>(null);
   const [registry] = useState(() => new LabelRegistry());
@@ -38,7 +39,7 @@ export function Viewer({ scene, status, selectedZone, onSelectZone }: ViewerProp
   // Fog starts just beyond the shop, wherever the camera starts.
   const cameraDistance = Math.hypot(...cameraPosition);
 
-  const placed = useMemo(() => layoutZones(scene), [scene]);
+  const placed = useMemo(() => layoutZones(scene, theme), [scene, theme]);
   const parts = useMemo(
     () =>
       new Map(

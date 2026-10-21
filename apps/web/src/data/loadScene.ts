@@ -6,11 +6,13 @@ import {
   type Scene,
   type ValidationError,
 } from '@diorama/schema';
+import { getTheme, listThemes, themeInfo, type Theme } from '@diorama/themes';
 import exampleIssues from '../../../../examples/corner-shop.issues.json';
 import exampleScene from '../../../../examples/corner-shop.scene.json';
 
 export interface LoadedScene {
   scene: Scene;
+  theme: Theme;
   issues: Map<IssueRef, IssueState>;
   /** Where the scene came from, for display and logs. */
   source: string;
@@ -47,7 +49,18 @@ export async function loadFromSearch(
 
 /** Validates already-parsed scene and issue JSON. Missing issues means "nothing reported yet". */
 export function fromJson(sceneJson: unknown, issuesJson: unknown = {}, source: string): LoadResult {
-  const scene = validateScene(sceneJson);
+  const shape = validateScene(sceneJson);
+  if (!shape.success) return { ok: false, source, errors: shape.errors };
+  const theme = getTheme(shape.scene.theme);
+  if (!theme) {
+    const known = listThemes()
+      .map((t) => t.id)
+      .join(', ');
+    const message = `unknown theme "${shape.scene.theme}" (available: ${known})`;
+    return { ok: false, source, errors: [{ path: 'theme', message }] };
+  }
+  // Second pass: the theme must be able to draw every metaphor and asset the scene names.
+  const scene = validateScene(sceneJson, { theme: themeInfo(theme) });
   if (!scene.success) return { ok: false, source, errors: scene.errors };
   const issues = validateIssueStates(issuesJson);
   if (!issues.success) {
@@ -57,7 +70,7 @@ export function fromJson(sceneJson: unknown, issuesJson: unknown = {}, source: s
       errors: issues.errors.map((e) => ({ ...e, path: `issues: ${e.path}` })),
     };
   }
-  return { ok: true, value: { scene: scene.scene, issues: issues.issues, source } };
+  return { ok: true, value: { scene: scene.scene, theme, issues: issues.issues, source } };
 }
 
 /** Tells a scene file from an issue-state file by its content. */

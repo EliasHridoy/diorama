@@ -210,21 +210,11 @@ const PROPS: Readonly<Record<string, ReactNode>> = {
   crate: <Crate />,
 };
 
-/** Asset a part gets when the scene doesn't name one. */
-const DEFAULT_ASSET: Readonly<Record<string, string>> = {
-  entrance: 'door',
-  shelves: 'shelf',
-  trolley: 'trolley',
-  counter: 'counter',
-  warehouse: 'pallet',
-  'postal-route': 'letterbox',
-  'analyst-room': 'analyst-desk',
-  interpreter: 'interpreter',
-};
+/** Names of the assets this viewer can draw. Every theme asset must be one of them. */
+// eslint-disable-next-line react-refresh/only-export-components
+export const PROP_ASSETS: readonly string[] = Object.keys(PROPS);
 
-export function Prop({ asset, metaphor }: { asset: string | undefined; metaphor: string }) {
-  const name = [asset, DEFAULT_ASSET[metaphor]].find(
-    (a) => a !== undefined && Object.hasOwn(PROPS, a),
-  );
-  return name ? PROPS[name] : <Crate />;
+/** Draws an asset by name; unknown names fall back to a crate rather than failing. */
+export function Prop({ asset }: { asset: string }) {
+  return Object.hasOwn(PROPS, asset) ? PROPS[asset] : <Crate />;
 }

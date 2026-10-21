@@ -80,18 +80,20 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 ---
 
-## ⬜ Phase 3 — Theme system (`packages/themes`)
+## 🟨 Phase 3 — Theme system (`packages/themes`)
 
 **Goal:** The shop is data, not hard-coded React. Adding a theme doesn't touch viewer code.
 
-- [ ] Theme manifest: id, name, slots (id, position, footprint), metaphor vocabulary, assets per part type
-- [ ] Real low-poly glTF assets for the 5 MVP zones (CC0 kit + Draco/meshopt compression)
-- [ ] **Common kit** usable by every theme: analyst's room (analytics), postal system (notifications), interpreter (translation/i18n)
-- [ ] Generic **annex** slot as the last resort for modules that fit neither
-- [ ] Layout rule for N parts inside a zone (grid/row inside the slot footprint)
-- [ ] Schema ↔ theme validation (metaphor/asset must exist in theme)
+- [x] Theme manifest: id, name, slots (id, position, footprint), metaphor vocabulary, assets per part type
+- [ ] **Deferred:** real low-poly glTF assets (CC0 kit + Draco/meshopt compression). Waiting on D-07; props are still primitives, behind a theme `assets` list so swapping them later touches only `viewer/props.tsx`
+- [x] **Common kit** usable by every theme: analyst's room (analytics), postal system (notifications), interpreter (translation/i18n)
+- [x] Generic **annex** slot as the last resort for modules that fit neither
+- [x] Layout rule for N parts inside a zone (grid/row inside the slot footprint)
+- [x] Schema ↔ theme validation (metaphor/asset must exist in theme)
 
-**Exit check:** Swapping `theme` in the JSON to a second tiny test theme (even just coloured boxes) renders without code changes.
+**Done:** `packages/themes` (manifest, layout, common kit, `ecommerce-shop`, `test-boxes`); the viewer reads the theme named in the scene and rejects unknown themes, metaphors and assets with readable errors. `examples/corner-shop.test-boxes.scene.json` is the shop re-themed by editing only JSON.
+
+**Exit check (met):** Swapping `theme` in the JSON to a second tiny test theme (even just coloured boxes) renders without code changes.
 
 ---
 

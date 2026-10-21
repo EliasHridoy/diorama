@@ -2,7 +2,7 @@ import type { Zone, ZoneStatus } from '@diorama/schema';
 import type { ThreeEvent } from '@react-three/fiber';
 import { useMemo } from 'react';
 import { Color } from 'three';
-import type { PlacedZone } from '../theme/shopLayout.ts';
+import type { PlacedZone } from '@diorama/themes';
 import { PLATFORM_HEIGHT, type PartPlacement } from './geometry.ts';
 import { PartModel } from './PartModel.tsx';
 
@@ -72,8 +72,7 @@ export function ZoneView({
             onPointerOut={() => onHoverPart(null)}
           >
             <PartModel
-              asset={part.asset}
-              metaphor={zone.metaphor}
+              asset={part.asset ?? placed.defaultAsset}
               status={partStatus.status}
               accent={placed.accent}
               highlighted={hoveredPart === part.id}

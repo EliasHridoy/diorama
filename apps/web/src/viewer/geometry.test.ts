@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import type { PlacedZone } from '../theme/shopLayout.ts';
+import type { PlacedZone } from '@diorama/themes';
 import { flowCurve, PLATFORM_HEIGHT, placeParts, zoneLabelAnchor } from './geometry.ts';
 
-const zone: PlacedZone = { x: 10, z: -4, width: 6, depth: 2, accent: '#000', annex: false };
+const zone: PlacedZone = {
+  x: 10,
+  z: -4,
+  width: 6,
+  depth: 2,
+  accent: '#000',
+  annex: false,
+  defaultAsset: 'crate',
+};
 
 describe('placeParts', () => {
   it('offsets parts by the zone position and stands them on the platform', () => {

@@ -27,3 +27,4 @@ Internal packages export TypeScript source directly (`"exports": "./src/index.ts
 - Viewer labels go through `LabelOverlay` / `LabelProjector` (one DOM layer), not drei `<Html>`: `<Html>` makes a React root per label and loses labels under React 19 StrictMode.
 - Animate three.js objects through a small class (see `PartAnimator`) rather than mutating `useState`/`useMemo` values in `useFrame`; the React Compiler lint rules reject the latter.
 - To see the viewer headless: run the dev server and screenshot with Playwright + `/usr/bin/google-chrome --use-angle=swiftshader`.
+- A theme is data in `packages/themes` (slots by metaphor, annex, asset names). Adding one must not need viewer changes beyond drawing any new asset name in `viewer/props.tsx`; a test fails if a theme names an asset the viewer can't draw.
