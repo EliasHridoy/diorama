@@ -13,6 +13,7 @@ Guidance for Claude Code sessions in this repo.
 - `pnpm dev`: run the web app
 - `pnpm check`: typecheck, lint, format check, test, build (same as CI). Run before every commit
 - `pnpm format`: apply Prettier
+- `pnpm --filter @diorama/schema gen:json-schema`: regenerate `scene.schema.json` after changing the Zod schema (a test fails if it is stale)
 
 Internal packages export TypeScript source directly (`"exports": "./src/index.ts"`); there is no separate package build step.
 

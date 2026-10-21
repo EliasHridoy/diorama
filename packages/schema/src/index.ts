@@ -1,2 +1,4 @@
-/** Version of the scene file format. Bump on breaking changes to the schema. */
-export const SCHEMA_VERSION = 1;
+export * from './scene.ts';
+export * from './validate.ts';
+export * from './status.ts';
+export { buildJsonSchema } from './json-schema.ts';

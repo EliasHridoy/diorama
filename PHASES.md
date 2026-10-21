@@ -45,16 +45,16 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 ---
 
-## ⬜ Phase 1 — Scene schema (`packages/schema`)
+## ✅ Phase 1 — Scene schema (`packages/schema`)
 
 **Goal:** A typed, validated, versioned definition of a scene, plus the status logic.
 
-- [ ] Zod schemas: `Scene`, `Zone`, `Part`, `Flow`, `IssueRef` (`"github:12"` style), `schemaVersion`
-- [ ] Inferred TS types + exported JSON Schema (for editors and for the LLM's structured output later)
-- [ ] `deriveStatus(scene, issueStates)` → per-part and per-zone `planned | in_progress | done` + % complete
-- [ ] Validation rules beyond shape: unique ids, flows point at real zones, metaphor exists in theme (theme check can be a hook)
-- [ ] Example scenes: `examples/corner-shop.scene.json` (5 zones, ~15 parts, a few flows)
-- [ ] Unit tests for validation + status derivation
+- [x] Zod schemas: `Scene`, `Zone`, `Part`, `Flow`, `IssueRef` (`"github:12"` style), `schemaVersion`
+- [x] Inferred TS types + exported JSON Schema (for editors and for the LLM's structured output later)
+- [x] `deriveStatus(scene, issueStates)` → per-part and per-zone `planned | in_progress | done` + % complete
+- [x] Validation rules beyond shape: unique ids, flows point at real zones, metaphor exists in theme (theme check can be a hook)
+- [x] Example scenes: `examples/corner-shop.scene.json` (6 zones incl. a common-kit postal route, 15 parts, 5 flows) + `corner-shop.issues.json` with fake tracker state
+- [x] Unit tests for validation + status derivation
 
 **Exit check:** `pnpm test` covers good + broken example scenes; status rollup is tested.
 

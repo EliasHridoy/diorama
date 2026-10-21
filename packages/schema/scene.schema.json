@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "description": "Path or URL of this JSON Schema, for editors",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repo": {
+          "description": "Tracker repository, e.g. \"github:acme/corner-shop\"",
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*:\\S+$"
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "theme": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Theme id, e.g. \"ecommerce-shop\""
+    },
+    "zones": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+            "description": "Lowercase slug, unique within its parent"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Name of the software module, e.g. \"Checkout & payments\""
+          },
+          "description": {
+            "type": "string"
+          },
+          "metaphor": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Theme slot that draws this module, e.g. \"entrance\" or \"shelves\""
+          },
+          "parts": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+                  "description": "Lowercase slug, unique within its parent"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Human-readable name shown in the viewer"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "asset": {
+                  "description": "Theme asset used to draw this part; the theme picks a default when omitted",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "issues": {
+                  "default": [],
+                  "description": "Issues whose state decides how built this part is",
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]*:\\S+$",
+                    "description": "Tracker issue reference, \"<provider>:<id>\", e.g. \"github:12\""
+                  }
+                }
+              },
+              "required": ["id", "label"],
+              "additionalProperties": false,
+              "description": "A buildable piece of a zone"
+            }
+          }
+        },
+        "required": ["id", "label", "metaphor"],
+        "additionalProperties": false,
+        "description": "A software module placed in the theme"
+      }
+    },
+    "flows": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+            "description": "Zone the data leaves"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+            "description": "Zone the data arrives at"
+          },
+          "label": {
+            "description": "What moves, e.g. \"add item\"",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["from", "to"],
+        "additionalProperties": false,
+        "description": "Directed data flow between two zones"
+      }
+    }
+  },
+  "required": ["schemaVersion", "project", "theme", "zones"],
+  "additionalProperties": false,
+  "description": "A Diorama scene: software modules mapped onto a themed 3D world"
+}
