@@ -4,8 +4,8 @@ A running log of choices. **Open** = needs your call (my recommendation is given
 
 | ID | Topic | Status | Needed by |
 |---|---|---|---|
-| D-01 | Monorepo tooling | Open | Phase 0.2 |
-| D-02 | Web framework | Open | Phase 0.2 |
+| D-01 | Monorepo tooling | Decided (pnpm workspaces) | — |
+| D-02 | Web framework | Decided (Vite + React + R3F) | — |
 | D-03 | Backend shape | Open | Phase 4 |
 | D-04 | License | Decided (MIT, changeable) | — |
 | D-05 | GitHub auth | Open | Phase 4 / 6 |
@@ -13,20 +13,20 @@ A running log of choices. **Open** = needs your call (my recommendation is given
 | D-07 | Art style & assets | Open | Phase 2 |
 | D-08 | LLM key & cost model | Open | Phase 5 |
 | D-09 | Hosting | Open | Phase 6 |
-| D-10 | Product-first or research-first | Open | Before Phase 5 |
+| D-10 | Product-first or research-first | Decided (research-first) | — |
 | D-11 | The AI does not generate 3D meshes | Decided | — |
 | D-12 | Status is derived, never stored | Decided | — |
+| D-13 | Cross-theme common kit | Decided | — |
 
 ---
 
-### D-01 — Monorepo tooling · Open
-- **Options:** pnpm workspaces only · pnpm + Turborepo · Nx
-- **Recommendation:** **pnpm workspaces only.** Add Turborepo later if builds get slow. Nx is overkill here.
+### D-01 — Monorepo tooling · Decided: pnpm workspaces
+One monorepo with pnpm workspaces. Add Turborepo later only if builds get slow. Nx is overkill here.
 
-### D-02 — Web framework · Open
-- **Options:** Next.js (as in the original doc) · Vite + React SPA
-- **Recommendation:** **Vite + React SPA** for the viewer. The 3D canvas is all client-side, so Next.js's SSR/RSC adds friction to R3F and gives us nothing until we need server routes. If we later want API routes in the same app, D-03 can still add a small server.
-- **Trade-off:** Next.js would give us API routes + OAuth helpers (Auth.js) in one deploy. If you value "one deployable thing" over simplicity, choose Next.js.
+### D-02 — Web framework & renderer · Decided: Vite + React + React Three Fiber (three.js)
+- **Why not Next.js:** the 3D canvas is entirely client-side, so SSR/RSC adds friction and no benefit.
+- **Why not Rust (Bevy/wgpu → WASM) for now:** three.js and Bevy both draw through the browser's WebGL/WebGPU, and a diorama of a few hundred objects is limited by the GPU, not by JavaScript. Rust would bring a bigger first download (several MB of WASM), slower iteration, fewer ready-made tools and fewer contributors. That's a bad trade for a research tool that participants open from a link.
+- **Rust stays possible:** the scene format is language-neutral (JSON Schema), so a Bevy viewer could be added later. If profiling finds a CPU hot spot (layout of huge scenes, thousands of flow particles), that piece can be written in Rust → WASM and called from TS.
 
 ### D-03 — Backend shape · Open
 - **Options:**
@@ -58,14 +58,14 @@ MIT is the most permissive and common for dev tools. Switch to Apache-2.0 if you
 - **Options:** Static (GitHub Pages / Cloudflare Pages) + small server on Fly.io/Render/Cloudflare Workers · Vercel · Self-host only (Docker)
 - **Recommendation:** decide in Phase 6. With D-02 = Vite and D-03 = (a), the viewer can go on **GitHub Pages for free** from day one as a live demo.
 
-### D-10 — Product-first or research-first · Open
-This is the biggest "who is this for?" question.
-- **Product-first:** optimise for real users and contributors; research is a nice-to-have.
-- **Research-first (e.g. thesis/paper):** we need from early on an eval dataset for RQ2, a "Kanban view" of the same data for RQ1 comparisons, interaction logging (with consent), and a study plan/ethics approval timeline.
-- **Recommendation:** tell me which. If research matters even a bit, we add the RQ2 eval set in Phase 5 (cheap) and a Kanban view in Phase 6 (cheap), and keep the rest optional.
+### D-10 — Product-first or research-first · Decided: research-first
+The research questions (RQ1–RQ3) drive priorities. Consequences: an RQ2 eval set lands with the agent (Phase 5); a Kanban baseline view and a study mode with consented logging land in Phase 6; the viewer has an interaction-event hook from Phase 2; ethics approval and the target venue are worked on in parallel. Plan: [docs/research.md](docs/research.md).
 
 ### D-11 — The AI does not generate 3D meshes · Decided
 The AI produces a **scene schema** (which modules, which metaphors, which parts, which flows). Themes render it from curated assets. "AI-generated 3D prototype" in the pitch means *AI-composed*, not AI-modelled. Reason: reliability, consistency, testability and speed.
 
 ### D-12 — Status is derived, never stored · Decided
 Part/zone status is computed from issue + PR state at runtime. The scene file only stores *structure* and *links*. Reason: one source of truth (the tracker), no drift.
+
+### D-13 — Cross-theme common kit · Decided
+Modules that appear in most products get reusable metaphors that work in any theme: **analytics → analyst's room** (person at a desk with documents and charts), **notifications → postal system** (mailbox → sorting station → recipient's letterbox), **translation/i18n → interpreter** (a person relaying speech between two others). The generic annex is the last resort. Reason: richer than a blank box, written once and reused by every theme, and the postal route doubles as a data-flow animation.

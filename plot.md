@@ -108,7 +108,7 @@ Layers and responsibilities:
 5. **Sync** — keeps the scene's derived status fresh (polling first, webhooks later) and pushes updates to viewers.
 6. **Agent** (`packages/agent`) — the interview and module→zone mapping using the Claude API with structured output.
 
-**Stack (proposed):** TypeScript everywhere, pnpm workspaces, React + React Three Fiber + drei on Three.js, Zod for schema, Claude API for the agent, SQLite (via a light ORM) only once we need server state. See [DECISIONS.md](DECISIONS.md) for what's settled vs open.
+**Stack:** TypeScript everywhere, pnpm workspaces, Vite + React + React Three Fiber + drei on three.js, Zod for schema, Claude API for the agent, SQLite (via a light ORM) only once we need server state. See [DECISIONS.md](DECISIONS.md) for what's settled vs open.
 
 ## 8. Scene schema — first draft
 
@@ -166,6 +166,18 @@ The scene file can live **in the target repo itself** as `.diorama/scene.json` �
 
 **Data-flow example:** a parcel moves shelf → trolley → counter → warehouse → van.
 
+### Common kit: metaphors that work in every theme
+
+Some modules show up in almost every product, whatever the business. They get their own **common kit**: small scenes any theme can place next to its domain zones. They're more meaningful than a blank annex and more reusable than shop-only props.
+
+| Software module | Common-kit metaphor | Natural data flow |
+|---|---|---|
+| Analytics / reporting | **Analyst's room**: a person at a desk covered in documents, charts on the wall | Data from other zones arrives as paper stacks on the desk |
+| Notifications (email, push, SMS) | **Postal system**: sender drops a letter in a mailbox → sorting station → letter reaches the recipient's letterbox | A letter travelling the route (a natural fit for v0.2 flow animation) |
+| Translation / i18n | **Interpreter**: one person listens to a speaker and talks to a third person | Speech bubbles changing language as they pass through |
+
+The **annex** stays as the last resort for modules that fit neither the theme nor the common kit. Good candidates to add to the kit later: logging/audit (security camera room or archive), file storage (storage lockers), scheduling/cron (clock tower), search (library card catalogue).
+
 ## 10. Scope
 
 **v0.1 (MVP) must do:**
@@ -187,13 +199,19 @@ The scene file can live **in the target repo itself** as `.diorama/scene.json` �
 - **RQ2:** Can an LLM reliably turn a backlog into a coherent spatial metaphor?
 - **RQ3:** Does seeing data flow help teams find integration problems earlier?
 
-If research is a real goal, it affects engineering choices early (see DECISIONS.md D-10): we'd want an eval set for RQ2 and a "Kanban mode" of the same data for RQ1 comparisons.
+**Diorama is research-first (DECISIONS.md D-10).** That shapes engineering from the start:
+- **RQ1** needs a **Kanban view of the same data**, so participants compare like with like.
+- **RQ2** needs an **eval set** of project descriptions/backlogs with expected mappings, plus a scoring method.
+- **RQ3** needs a way to **inject integration problems** into a scene and measure who spots them and how fast.
+- Studies need **consented interaction logging** and a study protocol. Ethics approval can take weeks, so start it early.
+
+The research plan lives in [docs/research.md](docs/research.md).
 
 ## 12. Risks and how we handle them
 
 | Risk | Mitigation |
 |---|---|
-| Real projects have modules that don't fit the metaphor (analytics, notifications, i18n) | Theme has a generic "annex" slot + the agent may label custom props; never force a bad metaphor |
+| Real projects have modules that don't fit the metaphor (analytics, notifications, i18n) | Cross-theme **common kit** (analyst's room, postal system, interpreter) and then a generic "annex" slot; never force a bad metaphor |
 | Issues don't map cleanly to parts | Deterministic first: GitHub labels like `zone:cart`. Agent only *suggests*; user confirms |
 | The 3D looks cheap / art is a bottleneck | Low-poly style, CC0 kits (Kenney, Quaternius) in glTF, ghost effect via material not new models |
 | Scope creep for a solo project | Strict phases; each phase ends with something runnable; MVP list above is the contract |

@@ -15,6 +15,8 @@ Phase 6  MVP polish & release  inspect panel, 2D view, deploy, webhooks, v0.1.0
 Phase 7+ Roadmap               data flow animation, Jira, Theme SDK, timeline, research
 ```
 
+**Research-first:** a research track runs alongside every phase (related work, ethics, eval set, Kanban baseline, study mode). Details in [docs/research.md](docs/research.md).
+
 **Why this order?** The schema is the contract everything else talks through, so it comes first. The viewer comes before GitHub and AI because it's the part that proves the idea is *worth* building. If the shop doesn't look good with hand-written JSON, connectors and agents won't save it. GitHub before AI because real data shows what the agent needs to handle.
 
 Status legend: ⬜ not started · 🟨 in progress · ✅ done
@@ -65,6 +67,7 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 - [ ] Static flow lines between zones (no animation yet)
 - [ ] A "status override" dev panel to flip parts between states and watch the scene change
 - [ ] Load scene from file / URL param
+- [ ] One interaction-event hook (zone click, camera move, time on view), off by default, for later studies
 
 **Exit check:** You can show the screen to a non-developer and they can tell what's done and what isn't.
 **Decision needed during phase:** D-07 (art style / asset source).
@@ -76,7 +79,8 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 - [ ] Theme manifest: id, name, slots (id, position, footprint), metaphor vocabulary, assets per part type
 - [ ] Real low-poly glTF assets for the 5 MVP zones (CC0 kit + Draco/meshopt compression)
-- [ ] Generic **annex** slot for modules that don't fit the metaphor
+- [ ] **Common kit** usable by every theme: analyst's room (analytics), postal system (notifications), interpreter (translation/i18n)
+- [ ] Generic **annex** slot as the last resort for modules that fit neither
 - [ ] Layout rule for N parts inside a zone (grid/row inside the slot footprint)
 - [ ] Schema ↔ theme validation (metaphor/asset must exist in theme)
 
@@ -107,7 +111,7 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 - [ ] Mapping: modules → theme slots/metaphors, parts per zone, flows; issues → parts
 - [ ] Claude API with structured output validated against the Phase 1 JSON Schema; retry on invalid
 - [ ] Review screen: user edits/accepts the mapping before it's saved (agent never writes silently)
-- [ ] Small eval set: ~10 project descriptions + expected module lists → measure mapping quality (feeds RQ2)
+- [ ] RQ2 eval set (~10–20 project descriptions/backlogs + expected mappings) and a scoring script, run in CI or on demand
 - [ ] Bring-your-own API key handling (D-08)
 
 **Exit check:** Describe a shop in a few sentences → get a valid, sensible scene you'd accept with ≤ 3 edits.
@@ -122,6 +126,8 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 - [ ] Zone inspect panel: issues, assignees, progress, links
 - [ ] 2D list/table view of the same scene (accessibility + weak devices)
 - [ ] Sprint filter (show the world as of milestone N)
+- [ ] Kanban baseline view of the same scene (RQ1)
+- [ ] Study mode: consent screen, fixed scene, task prompts, timer, opt-in interaction logging
 - [ ] Deploy (D-09), demo project, screenshots/GIF in README
 - [ ] Tag `v0.1.0`
 
