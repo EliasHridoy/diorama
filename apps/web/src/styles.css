@@ -198,6 +198,13 @@ button[aria-pressed='true'] {
   border: 1px solid var(--in-progress);
 }
 
+.pill.dropped {
+  color: #6b7280;
+  background: #f0f1f4;
+  border: 1px dashed #9aa1ad;
+  text-decoration: line-through;
+}
+
 .pill.done {
   color: #fff;
   background: var(--done);
@@ -259,6 +266,11 @@ button[aria-pressed='true'] {
 
 .dot.planned {
   border: 1.5px dashed var(--planned);
+}
+
+.dot.dropped {
+  border: 1.5px dashed #9aa1ad;
+  background: #e4e7ec;
 }
 
 .dot.in_progress {
@@ -339,6 +351,13 @@ button[aria-pressed='true'] {
   background: #fff;
   color: var(--text);
   text-decoration: none;
+}
+
+.chip.closed.dropped {
+  background: #f0f1f4;
+  border: 1px dashed #9aa1ad;
+  color: #6b7280;
+  text-decoration: line-through;
 }
 
 .chip.closed {
@@ -428,4 +447,87 @@ button[aria-pressed='true'] {
   .dev {
     display: none;
   }
+}
+
+/* GitHub dialog and status */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 38, 51, 0.35);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 40;
+}
+
+.modal {
+  width: min(480px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: #fff;
+}
+
+.field {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.field input {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  font: inherit;
+  font-weight: 400;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.tray {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.tray li {
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.github-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--done);
+}
+
+.sync-dot.syncing {
+  background: var(--in-progress);
+}
+
+.sync-dot.error {
+  background: #d92d20;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #fdf1dc;
+  border: 1px solid var(--in-progress);
+  color: #9a5b00;
+}
+
+.issue-meta {
+  margin-top: 4px;
 }

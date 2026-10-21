@@ -4,7 +4,7 @@
 
 Diorama turns a software idea into a 3D model of the finished product, using a metaphor from the business's own world (an online shop becomes an actual shop). Every module starts as a translucent ghost and turns solid as the team closes the issues behind it. Managers, developers and clients can all see what's being built, how far along it is, and how the parts connect.
 
-> 🚧 **Status: Phase 2, a static 3D viewer.** It isn't connected to GitHub yet. Follow along in [PHASES.md](PHASES.md).
+> 🚧 **Status: Phase 4, a GitHub-connected viewer.** The AI agent (Phase 5) isn't built yet, so scenes are hand-written. Follow along in [PHASES.md](PHASES.md).
 
 ![Corner Shop diorama: built parts are solid, in-progress parts are amber, planned parts are blue ghosts](docs/images/viewer-phase-2.png)
 
@@ -17,6 +17,7 @@ pnpm dev          # opens the corner-shop example
 
 - Click a zone to see its parts, issues and data flows; hover a part to see its name.
 - Press **Dev** to flip issue states (open → PR open → closed) and watch parts build.
+- Press **Connect GitHub**, enter `owner/name` and a fine-grained token (read access to Issues, Contents, Pull requests). It reads `.diorama/scene.json` from the repo, refreshes issues every minute, and a **Sync now** button forces it. Label an issue `part:<zone>/<part>` to place it; issues without a place appear in a tray. The token stays in the tab's memory and is only sent to api.github.com.
 - Load your own files with **Open files…**, by dropping them on the page, or with `?scene=<url>&issues=<url>`. See [examples/](examples/).
 
 ## How it works (planned)

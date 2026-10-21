@@ -1,3 +1,4 @@
+import { applyLabelLinks, toIssueStates, type NormalizedIssue } from '@diorama/connectors';
 import {
   deriveStatus,
   type IssueRef,
@@ -6,8 +7,12 @@ import {
 } from '@diorama/schema';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fromJson, isSceneJson, loadFromSearch, type LoadedScene } from './data/loadScene.ts';
+import { connectToRepo } from './github/connect.ts';
+import { useGitHubSync } from './github/useGitHubSync.ts';
 import { track } from './telemetry.ts';
 import { DevPanel } from './ui/DevPanel.tsx';
+import { GitHubDialog } from './ui/GitHubDialog.tsx';
+import { GitHubStatus } from './ui/GitHubStatus.tsx';
 import { Header } from './ui/Header.tsx';
 import { ZonePanel } from './ui/ZonePanel.tsx';
 import { Viewer } from './viewer/Viewer.tsx';
@@ -15,11 +20,18 @@ import { Viewer } from './viewer/Viewer.tsx';
 type AppState =
   | { kind: 'loading' }
   | { kind: 'error'; source: string; errors: ValidationError[] }
-  | { kind: 'ready'; loaded: LoadedScene; issues: Map<IssueRef, IssueState> };
+  | {
+      kind: 'ready';
+      loaded: LoadedScene;
+      issues: Map<IssueRef, IssueState>;
+      /** Issues from the connected tracker, or null when nothing is connected. */
+      tracker: NormalizedIssue[] | null;
+    };
 
 export function App() {
   const [state, setState] = useState<AppState>({ kind: 'loading' });
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
+  const [githubOpen, setGithubOpen] = useState(false);
   const [devOpen, setDevOpen] = useState(() => new URLSearchParams(location.search).has('dev'));
 
   const show = useCallback((result: Awaited<ReturnType<typeof loadFromSearch>>) => {
@@ -29,12 +41,51 @@ export function App() {
       return;
     }
     track({ type: 'scene_load', source: result.value.source });
-    setState({ kind: 'ready', loaded: result.value, issues: result.value.issues });
+    setState({
+      kind: 'ready',
+      loaded: result.value,
+      issues: result.value.issues,
+      tracker: null,
+    });
   }, []);
 
   useEffect(() => {
     void loadFromSearch(location.search).then(show);
   }, [show]);
+
+  const onIssues = useCallback((tracker: NormalizedIssue[]) => {
+    setState((s) => (s.kind === 'ready' ? { ...s, tracker, issues: toIssueStates(tracker) } : s));
+  }, []);
+  const github = useGitHubSync(onIssues);
+  const { disconnect } = github;
+
+  const connect = async (repoText: string, token: string): Promise<string | null> => {
+    const result = await connectToRepo({ repoText, token });
+    if (!result.ok) return result.message;
+
+    let loaded = state.kind === 'ready' ? state.loaded : null;
+    if (result.scene) {
+      const fromRepo = fromJson(result.scene.json, {}, result.scene.source);
+      if (!fromRepo.ok) {
+        const first = fromRepo.errors[0];
+        return `The repo's scene file is not a valid scene: ${first?.path ? `${first.path} ` : ''}${first?.message ?? 'unknown error'}`;
+      }
+      loaded = fromRepo.value;
+      track({ type: 'scene_load', source: loaded.source });
+    }
+    if (!loaded)
+      return 'This repository has no .diorama/scene.json and no scene is open. Open a scene file first.';
+
+    setSelectedZone(null);
+    setState({
+      kind: 'ready',
+      loaded,
+      issues: toIssueStates(result.issues.issues),
+      tracker: result.issues.issues,
+    });
+    github.attach(result.connection, result.issues.truncated);
+    return null;
+  };
 
   const openFiles = useCallback(
     async (files: FileList | File[]) => {
@@ -49,6 +100,7 @@ export function App() {
       });
       if (!parsed) return;
 
+      disconnect();
       const sceneFile = parsed.find((f) => isSceneJson(f.json));
       const issuesFile = parsed.find((f) => !isSceneJson(f.json));
       if (sceneFile) {
@@ -58,7 +110,7 @@ export function App() {
         show(fromJson(state.loaded.scene, issuesFile.json, state.loaded.source));
       }
     },
-    [show, state],
+    [show, state, disconnect],
   );
 
   useDropFiles(openFiles);
@@ -74,17 +126,28 @@ export function App() {
   }, []);
 
   const ready = state.kind === 'ready' ? state : null;
-  const status = useMemo(
-    () => (ready ? deriveStatus(ready.loaded.scene, ready.issues) : null),
+  // Issues placed by their labels are added on top of the scene file, never written into it.
+  const labelled = useMemo(
+    () => (ready ? applyLabelLinks(ready.loaded.scene, ready.tracker ?? []) : null),
     [ready],
+  );
+  const status = useMemo(
+    () => (ready && labelled ? deriveStatus(labelled.scene, ready.issues) : null),
+    [ready, labelled],
+  );
+  const details = useMemo(
+    () => new Map((ready?.tracker ?? []).map((issue) => [issue.ref, issue])),
+    [ready?.tracker],
   );
 
   if (state.kind === 'loading') return <p className="centered muted">Loading scene…</p>;
   if (state.kind === 'error')
     return <ErrorView source={state.source} errors={state.errors} onOpen={openFiles} />;
-  if (!status) return null;
+  if (!status || !labelled) return null;
 
-  const { scene, theme } = state.loaded;
+  const { theme } = state.loaded;
+  const scene = labelled.scene;
+  const unmappedOpen = labelled.unmapped.filter((u) => u.issue.state === 'open').length;
   return (
     <div className="app">
       <Viewer
@@ -97,6 +160,12 @@ export function App() {
       <Header scene={scene} status={status} source={state.loaded.source} />
       <div className="toolbar">
         <OpenButton onOpen={openFiles} />
+        <GitHubStatus
+          connection={github.connection}
+          info={github.info}
+          unmappedOpen={unmappedOpen}
+          onOpen={() => setGithubOpen(true)}
+        />
         <button className="dev-toggle" aria-pressed={devOpen} onClick={() => setDevOpen((o) => !o)}>
           Dev
         </button>
@@ -106,6 +175,7 @@ export function App() {
           scene={scene}
           status={status}
           issues={state.issues}
+          details={details}
           zoneId={selectedZone}
           onClose={() => selectZone(null)}
           onSelectZone={selectZone}
@@ -116,7 +186,28 @@ export function App() {
           scene={scene}
           issues={state.issues}
           onChange={(issues) => setState({ ...state, issues })}
-          onReset={() => setState({ ...state, issues: state.loaded.issues })}
+          onReset={() =>
+            setState({
+              ...state,
+              issues: state.tracker ? toIssueStates(state.tracker) : state.loaded.issues,
+            })
+          }
+        />
+      )}
+      {githubOpen && (
+        <GitHubDialog
+          connection={github.connection}
+          info={github.info}
+          suggestedRepo={scene.project.repo?.replace(/^github:/, '') ?? ''}
+          unmapped={labelled.unmapped}
+          labelLinked={labelled.labelLinked.length}
+          onConnect={connect}
+          onDisconnect={() => {
+            github.disconnect();
+            setState({ ...state, tracker: null });
+          }}
+          onSyncNow={github.syncNow}
+          onClose={() => setGithubOpen(false)}
         />
       )}
     </div>

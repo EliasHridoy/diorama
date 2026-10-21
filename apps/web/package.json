@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@diorama/connectors": "workspace:^",
     "@diorama/schema": "workspace:^",
     "@diorama/themes": "workspace:^",
     "@react-three/drei": "^10.7.9",
