@@ -1,14 +1,20 @@
-import type { IssueRef, Part, Scene, Zone } from './scene.ts';
+import { z } from 'zod';
+import { IssueRefSchema, type IssueRef, type Part, type Scene, type Zone } from './scene.ts';
 
 /** How built something is: ghost, partly solid, or solid. */
 export type BuildStatus = 'planned' | 'in_progress' | 'done';
 
 /** Tracker state for one issue, as reported by a connector. */
-export interface IssueState {
-  state: 'open' | 'closed';
+export const IssueStateSchema = z.strictObject({
+  state: z.enum(['open', 'closed']),
   /** An open pull request is linked to the issue, so work has visibly started. */
-  hasOpenPullRequest?: boolean;
-}
+  hasOpenPullRequest: z.boolean().optional(),
+});
+
+/** Issue states keyed by ref, as stored in an `*.issues.json` file. */
+export const IssueStatesSchema = z.record(IssueRefSchema, IssueStateSchema);
+
+export type IssueState = z.infer<typeof IssueStateSchema>;
 
 export interface PartStatus {
   status: BuildStatus;

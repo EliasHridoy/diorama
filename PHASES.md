@@ -60,21 +60,23 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 ---
 
-## ⬜ Phase 2 — Static 3D viewer (`apps/web`)
+## 🟨 Phase 2 — Static 3D viewer (`apps/web`)
 
 **Goal:** Load a hand-written `scene.json` and see a shop diorama in the browser.
 
-- [ ] React Three Fiber canvas, orbit camera with sensible limits, soft lighting, ground plane
-- [ ] Place the 5 shop zones at fixed slot positions (placeholder boxes are fine at first)
-- [ ] **Ghost / in-progress / solid materials** (translucent + outline → partial → full colour)
-- [ ] Zone labels; hover highlight; click → side panel with parts and their (fake) issues
-- [ ] Static flow lines between zones (no animation yet)
-- [ ] A "status override" dev panel to flip parts between states and watch the scene change
-- [ ] Load scene from file / URL param
-- [ ] One interaction-event hook (zone click, camera move, time on view), off by default, for later studies
+- [x] React Three Fiber canvas, orbit camera with sensible limits, soft lighting, ground plane
+- [x] Place the 5 shop zones at fixed slot positions (+ the postal-route common-kit slot and annex slots; low-poly props built from primitives)
+- [x] **Ghost / in-progress / solid materials** (translucent + outline → partial → full colour)
+- [x] Zone labels; hover highlight; click → side panel with parts and their (fake) issues
+- [x] Static flow lines between zones (no animation yet)
+- [x] A "status override" dev panel to flip parts between states and watch the scene change
+- [x] Load scene from file / URL param (`?scene=…&issues=…`, an "Open files…" button, or drag and drop)
+- [x] One interaction-event hook (scene load, zone hover/select, camera move), off by default; `?log=console` prints events
 
-**Exit check:** You can show the screen to a non-developer and they can tell what's done and what isn't.
-**Decision needed during phase:** D-07 (art style / asset source).
+**Exit check:** You can show the screen to a non-developer and they can tell what's done and what isn't. ← **waiting on you**: show it to someone and note what confused them.
+**D-07:** primitive-built props are enough for now; the asset decision moves to Phase 3.
+
+**Follow-ups noticed:** JS bundle is ~357 KB gzipped (three.js + drei), worth trimming before release; on phones, the 2D list view (Phase 6) is the real answer.
 
 ---
 

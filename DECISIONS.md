@@ -10,7 +10,7 @@ A running log of choices. **Open** = needs your call (my recommendation is given
 | D-04 | License                                      | Decided (MIT, changeable)    | —           |
 | D-05 | GitHub auth                                  | Open                         | Phase 4 / 6 |
 | D-06 | Where the scene lives                        | Open                         | Phase 4     |
-| D-07 | Art style & assets                           | Open                         | Phase 2     |
+| D-07 | Art style & assets                           | Open                         | Phase 3     |
 | D-08 | LLM key & cost model                         | Open                         | Phase 5     |
 | D-09 | Hosting                                      | Open                         | Phase 6     |
 | D-10 | Product-first or research-first              | Decided (research-first)     | —           |
@@ -57,6 +57,7 @@ MIT is the most permissive and common for dev tools. Switch to Apache-2.0 if you
 
 - **Options:** Low-poly CC0 kits (Kenney, Quaternius) · Custom Blender models · Pure procedural boxes/shapes
 - **Recommendation:** **Low-poly CC0 kits** to start, isometric-ish camera, soft pastel palette. Boxes during early Phase 2. Custom art only when the idea is proven.
+- **Phase 2 status:** low-poly props built from three.js primitives (`apps/web/src/viewer/props.tsx`) look good enough to judge the idea, so real assets can wait until Phase 3.
 
 ### D-08 — LLM key & cost model · Open
 

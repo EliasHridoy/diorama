@@ -24,3 +24,6 @@ Internal packages export TypeScript source directly (`"exports": "./src/index.ts
 - `packages/schema` is the contract. Changes to it need a `schemaVersion` consideration and tests.
 - Status is derived from tracker state, never stored in the scene (D-12).
 - The AI composes scenes from theme assets; it never generates meshes (D-11).
+- Viewer labels go through `LabelOverlay` / `LabelProjector` (one DOM layer), not drei `<Html>`: `<Html>` makes a React root per label and loses labels under React 19 StrictMode.
+- Animate three.js objects through a small class (see `PartAnimator`) rather than mutating `useState`/`useMemo` values in `useFrame`; the React Compiler lint rules reject the latter.
+- To see the viewer headless: run the dev server and screenshot with Playwright + `/usr/bin/google-chrome --use-angle=swiftshader`.
