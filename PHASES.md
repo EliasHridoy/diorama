@@ -17,33 +17,36 @@ Phase 7+ Roadmap               data flow animation, Jira, Theme SDK, timeline, r
 
 **Research-first:** a research track runs alongside every phase (related work, ethics, eval set, Kanban baseline, study mode). Details in [docs/research.md](docs/research.md).
 
-**Why this order?** The schema is the contract everything else talks through, so it comes first. The viewer comes before GitHub and AI because it's the part that proves the idea is *worth* building. If the shop doesn't look good with hand-written JSON, connectors and agents won't save it. GitHub before AI because real data shows what the agent needs to handle.
+**Why this order?** The schema is the contract everything else talks through, so it comes first. The viewer comes before GitHub and AI because it's the part that proves the idea is _worth_ building. If the shop doesn't look good with hand-written JSON, connectors and agents won't save it. GitHub before AI because real data shows what the agent needs to handle.
 
 Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 ---
 
 ## ✅ Phase 0 — Foundation (part 1: done)
+
 **Goal:** A clean public repo with the plan written down.
 
 - [x] Planning docs: `plot.md`, `PHASES.md`, `DECISIONS.md`, `README.md`, `CLAUDE.md`
 - [x] Git repo + public GitHub repo
 - [x] License (MIT), `.gitignore`
 
-## ⬜ Phase 0 — Foundation (part 2: monorepo)
+## ✅ Phase 0 — Foundation (part 2: monorepo)
+
 **Goal:** `pnpm install && pnpm build && pnpm test` works on an empty monorepo.
 
-- [ ] pnpm workspaces: `apps/web`, `packages/schema` (others added when their phase starts)
-- [ ] Shared `tsconfig`, ESLint + Prettier, Vitest
-- [ ] GitHub Actions CI: install, typecheck, lint, test
-- [ ] `CONTRIBUTING.md` (short)
+- [x] pnpm workspaces: `apps/web`, `packages/schema` (others added when their phase starts)
+- [x] Shared `tsconfig`, ESLint + Prettier, Vitest
+- [x] GitHub Actions CI: install, typecheck, lint, test
+- [x] `CONTRIBUTING.md` (short)
 
 **Exit check:** CI is green on a PR.
-**Blocked by:** D-01 (monorepo tooling), D-02 (web framework).
+**Stack:** pnpm 9 workspaces, TypeScript 6.0 (typescript-eslint doesn't support TS 7 yet), Vite 8, React 19, ESLint 10, Prettier, Vitest 5, Node 24.
 
 ---
 
 ## ⬜ Phase 1 — Scene schema (`packages/schema`)
+
 **Goal:** A typed, validated, versioned definition of a scene, plus the status logic.
 
 - [ ] Zod schemas: `Scene`, `Zone`, `Part`, `Flow`, `IssueRef` (`"github:12"` style), `schemaVersion`
@@ -58,6 +61,7 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 ---
 
 ## ⬜ Phase 2 — Static 3D viewer (`apps/web`)
+
 **Goal:** Load a hand-written `scene.json` and see a shop diorama in the browser.
 
 - [ ] React Three Fiber canvas, orbit camera with sensible limits, soft lighting, ground plane
@@ -75,6 +79,7 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 ---
 
 ## ⬜ Phase 3 — Theme system (`packages/themes`)
+
 **Goal:** The shop is data, not hard-coded React. Adding a theme doesn't touch viewer code.
 
 - [ ] Theme manifest: id, name, slots (id, position, footprint), metaphor vocabulary, assets per part type
@@ -89,6 +94,7 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 ---
 
 ## ⬜ Phase 4 — GitHub connector (`packages/connectors`)
+
 **Goal:** Real issues drive the scene.
 
 - [ ] Auth for development: a fine-grained personal access token (OAuth comes in Phase 6)
@@ -105,6 +111,7 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 ---
 
 ## ⬜ Phase 5 — Agent (`packages/agent`)
+
 **Goal:** From a plain-English description (+ optional existing backlog) to a proposed scene.
 
 - [ ] Interview flow: 3–6 follow-up questions max, then a module list
@@ -119,6 +126,7 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 ---
 
 ## ⬜ Phase 6 — MVP polish & release (v0.1.0)
+
 **Goal:** Someone else can use it on their repo.
 
 - [ ] GitHub OAuth (or GitHub App) instead of PAT
@@ -136,10 +144,11 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 ---
 
 ## Phase 7+ — Roadmap after v0.1
-| Version | Feature |
-|---|---|
-| v0.2 | Animated data flow between zones (parcels moving along flows) |
-| v0.3 | Jira connector (connector interface proves itself) |
-| v0.4 | Theme SDK + community theme library (hospital, bank, food delivery) |
-| v0.5 | Timeline scrubber: replay the build sprint by sprint |
-| Research | User study: Diorama vs Kanban (RQ1–RQ3) |
+
+| Version  | Feature                                                             |
+| -------- | ------------------------------------------------------------------- |
+| v0.2     | Animated data flow between zones (parcels moving along flows)       |
+| v0.3     | Jira connector (connector interface proves itself)                  |
+| v0.4     | Theme SDK + community theme library (hospital, bank, food delivery) |
+| v0.5     | Timeline scrubber: replay the build sprint by sprint                |
+| Research | User study: Diorama vs Kanban (RQ1–RQ3)                             |
