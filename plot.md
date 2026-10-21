@@ -83,7 +83,7 @@ This keeps the AI part testable (it's "text in → validated JSON out") and the 
 | **Flow**         | A directed data edge between zones ("add item": catalogue → cart)                                               |
 | **Scene schema** | The JSON document describing zones, parts, flows, and links to issues. The heart of the system                  |
 | **Connector**    | Adapter to a tracker (GitHub, later Jira) that reports issue/milestone state                                    |
-| **Sprint**       | A GitHub Milestone (in v0.1)                                                                                    |
+| **Sprint**       | A GitHub Milestone (in v0.1). Read from the tracker, not stored in the scene                                    |
 
 ## 7. Architecture
 
@@ -110,38 +110,25 @@ Layers and responsibilities:
 
 **Stack:** TypeScript everywhere, pnpm workspaces, Vite + React + React Three Fiber + drei on three.js, Zod for schema, Claude API for the agent, SQLite (via a light ORM) only once we need server state. See [DECISIONS.md](DECISIONS.md) for what's settled vs open.
 
-## 8. Scene schema — first draft
+## 8. Scene schema (v1)
 
-Improved from the original sketch: parts inside zones, tracker-agnostic issue refs, status _derived_ rather than stored, layout separated from meaning, and a schema version.
+Implemented in `packages/schema` (Zod). The JSON Schema is generated to `packages/schema/scene.schema.json` for editors and for the agent's structured output. Full example: [examples/corner-shop.scene.json](examples/corner-shop.scene.json).
 
 ```jsonc
 {
+  "$schema": "../packages/schema/scene.schema.json", // optional, gives editor autocomplete
   "schemaVersion": 1,
   "project": { "name": "Corner Shop", "repo": "github:acme/corner-shop" },
   "theme": "ecommerce-shop",
   "zones": [
     {
-      "id": "auth",
+      "id": "auth", // lowercase slug, unique in the scene
       "label": "Authentication",
       "metaphor": "entrance", // a slot the theme knows how to draw
-      "sprint": "milestone:1",
       "parts": [
-        { "id": "login", "label": "Login form", "asset": "door", "issues": ["github:12"] },
-        {
-          "id": "signup",
-          "label": "Sign-up flow",
-          "asset": "security-desk",
-          "issues": ["github:14"],
-        },
-      ],
-    },
-    {
-      "id": "catalogue",
-      "label": "Product catalogue",
-      "metaphor": "shelves",
-      "sprint": "milestone:2",
-      "parts": [
-        { "id": "listing", "label": "Product listing", "asset": "shelf", "issues": ["github:20"] },
+        // part ids are unique within their zone
+        { "id": "login", "label": "Login", "asset": "door", "issues": ["github:1", "github:2"] },
+        { "id": "signup", "label": "Sign-up", "issues": ["github:3"] },
       ],
     },
   ],
@@ -149,7 +136,15 @@ Improved from the original sketch: parts inside zones, tracker-agnostic issue re
 }
 ```
 
-Status is computed at runtime: a part is `done` when all its issues are closed, `in_progress` when some are closed or one has an open PR, else `planned`. A zone's status rolls up from its parts.
+Rules enforced by `validateScene`: unknown keys are rejected (catches typos), ids are unique, flows must join two different existing zones, there are no duplicate flows, and optionally every metaphor/asset must exist in the theme. All errors are reported at once with paths like `zones[2].parts[0].issues[1]`.
+
+**Status is computed, never stored (D-12)** by `deriveStatus(scene, issueStates)`:
+
+- **Part:** `done` when all its issues are closed; `in_progress` when some are closed or an open issue has an open PR; otherwise `planned`. Progress = closed / total issues.
+- **Zone:** `done` if all parts are done, `planned` if all are planned, else `in_progress`. Progress = mean of its parts.
+- **Scene:** progress = mean over all parts. Issues the tracker didn't report count as open and are listed as `missingIssues`.
+
+**Sprints are not in the scene (D-14).** Which sprint a part belongs to comes from its issues' milestones in the tracker, so it can't drift.
 
 The scene file can live **in the target repo itself** as `.diorama/scene.json` — versioned, reviewable in PRs, no database needed for v0.1 (see DECISIONS.md D-06).
 

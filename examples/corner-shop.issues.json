@@ -1,0 +1,19 @@
+{
+  "github:1": { "state": "closed" },
+  "github:2": { "state": "closed" },
+  "github:3": { "state": "closed" },
+  "github:4": { "state": "closed" },
+  "github:5": { "state": "closed" },
+  "github:6": { "state": "closed" },
+  "github:7": { "state": "closed" },
+  "github:8": { "state": "open" },
+  "github:9": { "state": "open", "hasOpenPullRequest": true },
+  "github:10": { "state": "open" },
+  "github:11": { "state": "open" },
+  "github:12": { "state": "open" },
+  "github:13": { "state": "open" },
+  "github:14": { "state": "open" },
+  "github:15": { "state": "open" },
+  "github:16": { "state": "closed" },
+  "github:17": { "state": "open" }
+}

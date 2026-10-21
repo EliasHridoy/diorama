@@ -2,21 +2,23 @@
 
 A running log of choices. **Open** = needs your call (my recommendation is given). **Decided** = settled; change it by editing here with a reason.
 
-| ID   | Topic                              | Status                       | Needed by   |
-| ---- | ---------------------------------- | ---------------------------- | ----------- |
-| D-01 | Monorepo tooling                   | Decided (pnpm workspaces)    | —           |
-| D-02 | Web framework                      | Decided (Vite + React + R3F) | —           |
-| D-03 | Backend shape                      | Open                         | Phase 4     |
-| D-04 | License                            | Decided (MIT, changeable)    | —           |
-| D-05 | GitHub auth                        | Open                         | Phase 4 / 6 |
-| D-06 | Where the scene lives              | Open                         | Phase 4     |
-| D-07 | Art style & assets                 | Open                         | Phase 2     |
-| D-08 | LLM key & cost model               | Open                         | Phase 5     |
-| D-09 | Hosting                            | Open                         | Phase 6     |
-| D-10 | Product-first or research-first    | Decided (research-first)     | —           |
-| D-11 | The AI does not generate 3D meshes | Decided                      | —           |
-| D-12 | Status is derived, never stored    | Decided                      | —           |
-| D-13 | Cross-theme common kit             | Decided                      | —           |
+| ID   | Topic                                        | Status                       | Needed by   |
+| ---- | -------------------------------------------- | ---------------------------- | ----------- |
+| D-01 | Monorepo tooling                             | Decided (pnpm workspaces)    | —           |
+| D-02 | Web framework                                | Decided (Vite + React + R3F) | —           |
+| D-03 | Backend shape                                | Open                         | Phase 4     |
+| D-04 | License                                      | Decided (MIT, changeable)    | —           |
+| D-05 | GitHub auth                                  | Open                         | Phase 4 / 6 |
+| D-06 | Where the scene lives                        | Open                         | Phase 4     |
+| D-07 | Art style & assets                           | Open                         | Phase 2     |
+| D-08 | LLM key & cost model                         | Open                         | Phase 5     |
+| D-09 | Hosting                                      | Open                         | Phase 6     |
+| D-10 | Product-first or research-first              | Decided (research-first)     | —           |
+| D-11 | The AI does not generate 3D meshes           | Decided                      | —           |
+| D-12 | Status is derived, never stored              | Decided                      | —           |
+| D-13 | Cross-theme common kit                       | Decided                      | —           |
+| D-14 | Sprints come from the tracker, not the scene | Decided                      | —           |
+| D-15 | Issues closed as "not planned"               | Open                         | Phase 4     |
 
 ---
 
@@ -81,3 +83,14 @@ Part/zone status is computed from issue + PR state at runtime. The scene file on
 ### D-13 — Cross-theme common kit · Decided
 
 Modules that appear in most products get reusable metaphors that work in any theme: **analytics → analyst's room** (person at a desk with documents and charts), **notifications → postal system** (mailbox → sorting station → recipient's letterbox), **translation/i18n → interpreter** (a person relaying speech between two others). The generic annex is the last resort. Reason: richer than a blank box, written once and reused by every theme, and the postal route doubles as a data-flow animation.
+
+### D-14 — Sprints come from the tracker, not the scene · Decided
+
+The original sketch put `"sprint"` on each zone. It is dropped from schema v1: parts in one zone often ship in different sprints, and storing it would drift from the tracker, the same reason as D-12. A part's sprint is read from its issues' milestones by the connector (Phase 4), and the sprint filter (Phase 6) uses that.
+
+### D-15 — Issues closed as "not planned" · Open
+
+GitHub can close an issue as _completed_ or _not planned_. Today `deriveStatus` counts any closed issue as built, so dropping a feature would make its part look finished.
+
+- **Options:** (a) count it as done (current) · (b) leave it out of the part's total, so a part whose issues were all dropped looks `planned` with nothing left to build · (c) a fourth status `dropped` drawn as a faded or crossed-out ghost
+- **Recommendation:** **(c)** when the connector lands in Phase 4. Seeing scope cuts is useful for stakeholders, and it's a measurable event for RQ1.
